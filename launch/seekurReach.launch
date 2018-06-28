@@ -1,0 +1,21 @@
+<!-- gmapping slam using 1 rob  ariaClientDriverNodesim5 works for both simulator and robot, run server demo 3 on robot-->
+<launch>
+	<param name="robot_description" textfile="$(find ariaclientdriver)/urdf/pioneer1_new.urdf" />
+	<group ns="pioneer1">
+    		<param name="tf_prefix" value="pioneer1" />
+		<node name="ariaClientDriverNode" pkg="ariaclientdriver" type="ariaClientDriverNode" args="-host localhost -p 7272" output="screen"/>
+		<node name="gmapping" pkg="gmapping" type="slam_gmapping" output="screen">
+		  <!--remap from="scan" to="/scan" /-->
+                  <remap from="map" to="/map"/>
+ 		  <param name="odom_frame" value="odom" />
+  		  <param name="base_frame" value="pioneer1/base_link" />
+                  <param name="map_update_interval" value="5.0"/>
+                  <param name="map_frame" value="/map" />
+    		</node>
+	</group>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find ariaclientdriver)/rviz_conf/basic.rviz" />
+	<node pkg="ariaclientdriver" type="ReachIMU_Publisher.py" name="ReachIMU_Publisher"/>
+	<node pkg="ariaclientdriver" type="ReachGPS_Publisher.py" name="ReachGPS_Publisher"/>
+</launch>
+
+<!-- rosrun map_server map_saver -f map_name -->
